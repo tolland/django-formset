@@ -207,6 +207,16 @@
 	}
 }
 
+// Calendar widget
+[is="django-datecalendar"], [is="django-datetimecalendar"],
+[is="django-daterangecalendar"], [is="django-datetimerangecalendar"] {
+	& + .dj-calendar {
+		.sheet-body ul.monthdays {
+			grid-template-rows: repeat(6, 1fr);
+		}
+	}
+}
+
 // Calendar popup dialog
 [aria-haspopup="dialog"] + .dj-calendar {
 	box-shadow: lightgray 0 0 1rem;
