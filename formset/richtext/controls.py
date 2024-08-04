@@ -1,7 +1,7 @@
 import re
 
 from django.core.exceptions import ImproperlyConfigured
-from django.template.loader import select_template
+from django.template.loader import get_template, select_template
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
@@ -36,6 +36,18 @@ class ControlElement:
         template = self.get_template(renderer)
         if context is None:
             context = self.get_context()
+        return template.render(context)
+
+
+class Group(list):
+    template_name = 'formset/richtext/control_group.html'
+
+    def render(self, renderer, context=None):
+        if context is None:
+            context = {
+                'elements': [element.render(renderer) for element in self],
+            }
+        template = get_template(self.template_name)
         return template.render(context)
 
 

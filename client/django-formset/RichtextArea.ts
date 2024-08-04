@@ -936,7 +936,8 @@ class RichtextArea {
 	private readonly registeredActions = new Array<Action>();
 	public readonly formDialogs = new Array<RichtextFormDialog>();
 	private readonly useJson: boolean = false;
-	private readonly observer: MutationObserver;
+	private readonly attributesObserver: MutationObserver;
+	private readonly resizeObserver: ResizeObserver;
 	public editor!: Editor;
 	private initialValue!: JSONContent|string;
 	private characterCountTemplate?: Function;
@@ -953,7 +954,8 @@ class RichtextArea {
 		if (!StyleHelpers.stylesAreInstalled(this.baseSelector)) {
 			this.transferStyles();
 		}
-		this.observer = new MutationObserver(mutationsList => this.attributesChanged(mutationsList));
+		this.attributesObserver = new MutationObserver(mutationsList => this.attributesChanged(mutationsList));
+		this.resizeObserver = new ResizeObserver(() => this.wrapMenubar());
 		this.initializedPromise = this.initialize();
 	}
 
@@ -970,10 +972,23 @@ class RichtextArea {
 				}
 				this.contentUpdate();
 				this.installEventHandlers();
-				this.observer.observe(this.textAreaElement, {attributes: true});
+				this.attributesObserver.observe(this.textAreaElement, {attributes: true});
+				if (this.menubarElement) {
+					this.resizeObserver.observe(this.menubarElement);
+					this.wrapMenubar();
+				}
 				this.isInitialized = true;
 				resolve();
 			});
+		});
+	}
+
+	private wrapMenubar() {
+		this.menubarElement?.querySelectorAll('[role="group"]').forEach(element => {
+			if (!(element instanceof HTMLElement) || !(element.nextElementSibling instanceof HTMLElement))
+				return;
+			const sameRow = element.offsetLeft < element.nextElementSibling.offsetLeft;
+			element.classList.toggle('has-sibling', sameRow);
 		});
 	}
 

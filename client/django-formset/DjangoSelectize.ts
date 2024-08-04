@@ -40,7 +40,7 @@ export class DjangoSelectize extends IncompleteSelect {
 		this.observer = new MutationObserver(this.attributesChanged);
 		this.observer.observe(tomInput, {attributes: true});
 		this.initialValue = this.currentValue;
-		this.uniqueIdentifier = `ds-${Math.random().toString(36).substring(2, 15)}${Math.random().toString(36).substring(2, 15)}`;
+		this.uniqueIdentifier = `ds-${Math.random().toString(36).substring(2, 15)}`;
 		this.shadowRoot = this.wrapInShadowRoot();
 		DjangoSelectize.styleSheet = DjangoSelectize.styleSheet ?? this.transferStyles(nativeStyles);
 		this.appendIndividualStyleSheet(DjangoSelectize.styleSheet);

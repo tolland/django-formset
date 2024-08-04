@@ -22,7 +22,7 @@ class RichTextarea(Textarea):
 
     def __init__(self, attrs=None, control_elements=None):
         super().__init__(attrs)
-        if control_elements is not None:
+        if isinstance(control_elements, list):
             self.control_elements = control_elements
 
     def format_value(self, value):
@@ -48,19 +48,25 @@ class RichTextarea(Textarea):
         return context
 
     def render(self, name, value, attrs=None, renderer=None):
+        def add_dialog(control_element):
+            dialog_form = control_element.dialog_form
+            dialog_context = dialog_form.get_context()
+            dialog_form.induce_open = f'dialog_{dialog_form.extension}:active'
+            dialog_form.auto_id = '{form}_{control}_%s'.format(**attrs, control=dialog_form.extension)
+            dialog_forms.append(dialog_form.render(context=dialog_context, renderer=renderer))
+
         context = self.get_context(name, value, attrs)
         control_panel = format_html_join('', '{0}', (
             [elm.render(renderer)] for elm in self.control_elements
         ))
         dialog_forms = []
         for control_element in self.control_elements:
-            if not isinstance(control_element, controls.DialogControl):
-                continue
-            dialog_form = control_element.dialog_form
-            dialog_context = dialog_form.get_context()
-            dialog_form.induce_open = f'dialog_{dialog_form.extension}:active'
-            dialog_form.auto_id = '{form}_{control}_%s'.format(**attrs, control=dialog_form.extension)
-            dialog_forms.append(dialog_form.render(context=dialog_context, renderer=renderer))
+            if isinstance(control_element, controls.DialogControl):
+                add_dialog(control_element)
+            elif isinstance(control_element, controls.Group):
+                for elm in control_element:
+                    if isinstance(elm, controls.DialogControl):
+                        add_dialog(elm)
 
         context.update(
             control_panel=control_panel,
