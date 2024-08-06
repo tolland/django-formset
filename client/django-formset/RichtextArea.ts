@@ -72,7 +72,7 @@ abstract class Action {
 
 
 abstract class DropdownAction extends Action {
-	protected readonly dropdownMenu: HTMLUListElement | null;
+	protected readonly dropdownMenu: HTMLUListElement|null;
 	protected readonly dropdownItems: NodeListOf<Element>;
 
 	constructor(wrapperElement: HTMLElement, name: string, button: HTMLButtonElement, itemsSelector: string) {
@@ -723,7 +723,7 @@ class RichtextFormDialog extends FormDialog {
 			if (innerElement instanceof HTMLInputElement && innerElement.hasAttribute('richtext-selection')) {
 				this.textSelectionField = innerElement;
 			} else if (innerElement.hasAttribute('richtext-map-to') || innerElement.hasAttribute('richtext-map-from')) {
-				this.inputElements.push(innerElement as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement);
+				this.inputElements.push(innerElement as HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement);
 			} else if (innerElement instanceof HTMLButtonElement) {
 				const action = innerElement.getAttribute('df-click');
 				if (action?.startsWith('activate')) {
@@ -928,16 +928,16 @@ class RichtextFormDialog extends FormDialog {
 
 class RichtextArea {
 	public readonly textAreaElement: HTMLTextAreaElement;
-	private readonly menubarElement: HTMLElement | null;
+	private readonly menubarElement: HTMLElement|null;
 	public readonly wrapperElement: HTMLElement;
 	private readonly registeredActions = new Array<Action>();
 	public readonly formDialogs = new Array<RichtextFormDialog>();
 	private readonly useJson: boolean = false;
 	private readonly observer: MutationObserver;
 	public editor!: Editor;
-	private initialValue!: JSONContent | string;
+	private initialValue!: JSONContent|string;
 	private characterCountTemplate?: Function;
-	private charaterCountDiv: HTMLElement | null = null;
+	private charaterCountDiv: HTMLElement|null = null;
 	private readonly baseSelector = '.dj-richtext-wrapper';
 	public readonly initializedPromise: Promise<void>;
 	public isInitialized = false;
@@ -1016,7 +1016,7 @@ class RichtextArea {
 
 	private async registerFormDialogs(extensions: Array<Extension|Mark|Node>) {
 		return new Promise<void>(resolve => {
-			const promises = new Array<Promise<Mark | Node>>();
+			const promises = new Array<Promise<Mark|Node>>();
 			this.menubarElement?.querySelectorAll('button[df-click]').forEach(button => {
 				if (!(button instanceof HTMLButtonElement))
 					return;
@@ -1214,7 +1214,7 @@ class RichtextArea {
 		// TODO: remove event handlers
 	}
 
-	public getValue() : JSONContent | string {
+	public getValue() : JSONContent|string {
 		if (this.editor === undefined || this.editor.isEmpty)
 			return '';  // otherwise empty field is not detected by calling function
 		return this.useJson ? this.editor.getJSON() : this.editor.getHTML();

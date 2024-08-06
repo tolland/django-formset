@@ -7,12 +7,12 @@ import styles from './DjangoFormset.scss';
 export abstract class FormDialog {
 	protected readonly element: HTMLDialogElement;
 	protected readonly formElement: HTMLFormElement;
-	private readonly dialogHeaderElement: HTMLElement | null;
+	private readonly dialogHeaderElement: HTMLElement|null;
 	protected readonly isModal: boolean;
 	protected readonly induceOpen: Function;
 	protected readonly induceClose: Function;
 	private readonly baseSelector = 'dialog[is="django-dialog-form"]';
-	private dialogRect: DOMRect | null = null;
+	private dialogRect: DOMRect|null = null;
 	private dialogOffsetX: number = 0;
 	private dialogOffsetY: number = 0;
 
