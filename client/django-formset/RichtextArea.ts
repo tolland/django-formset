@@ -1020,7 +1020,7 @@ class RichtextArea {
 			this.menubarElement?.querySelectorAll('button[df-click]').forEach(button => {
 				if (!(button instanceof HTMLButtonElement))
 					return;
-				const dialogElement = this.wrapperElement?.querySelector(`dialog[df-induce-open="${button.name}:active"]`);
+				const dialogElement = this.wrapperElement?.querySelector(`:scope > dialog[df-induce-open="${button.name}:active"]`);
 				if (dialogElement instanceof HTMLDialogElement) {
 					const formDialog = new RichtextFormDialog(dialogElement, button, this);
 					if (this.formDialogs.find(dialog => dialog.extension === formDialog.extension))
