@@ -129,12 +129,6 @@ The class :class:`formset.richtext.controls.Superscript` can be used to mark tex
 which renders the selected text smaller and above the baseline.
 
 
-.. rubric:: Separator
-
-The class :class:`formset.richtext.controls.Separator` has no functional purpose. It can be used
-to separate the other buttons visually using a vertical bar.
-
-
 .. rubric:: Text Align
 
 The class :class:`formset.richtext.controls.TextAlign` can be used to align a block of text. It must
@@ -213,6 +207,19 @@ block. This is useful to show samples of code.
 
 The class :class:`formset.richtext.controls.Hardbreak` can be used to add a hard break to a
 paragraph, ie. add a ``<br>`` to the rendered HTML.
+
+
+.. rubric:: Separator
+
+The class :class:`formset.richtext.controls.Separator` has no functional purpose. It can be used
+to separate the other buttons visually using a vertical bar.
+
+
+.. rubric:: Group
+
+The class :class:`formset.richtext.controls.Group` is just a wrapper and can be used to group other
+control elements. Each group shows a vertical bar for visual separation unless it isn't the last
+entry in the current line. It hence can be used to group buttons which belong together.
 
 
 Composed Formatting Options

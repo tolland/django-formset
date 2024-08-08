@@ -1,5 +1,16 @@
 ## Changes
 
+1.5.1
+  * The published version of **django-formset** now also includes the monolithic build of all
+    JavaScript files.
+  * In RichtextArea: Add control element to select font family.
+  * Date- and DateTime-widgets as Calendar representation now always apply 6 rows to prevent widget
+    resizing when paginating.
+  * Fixing RichtextArea: Only find direct dialog element for a menu button.
+  * Fixing Selectize widget: Apply proper styles if group elements are nested. Happened when using
+    the widget in a RichtextArea's dialog.
+  * Fixed: Main stylesheet sometimes was loaded more than once.
+
 1.5
   * **Breaking Change:** Always include `<script src="{% url 'javascript-catalog' %}"></script>` to
     the `<head>`-section of an HTML template. This is because `gettext` is used inside many

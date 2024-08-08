@@ -49,6 +49,7 @@ the special widget :class:`formset.widgets.Selectize`:
 	            (2022, "Porto"),
 	            (2023, "Edinburgh"),
 	            (2024, "Vigo"),
+	            (2025, "Dublin"),
 	        ],
 	        widget=Selectize,
 	    )

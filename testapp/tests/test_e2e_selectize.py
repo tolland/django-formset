@@ -1,5 +1,6 @@
 import pytest
 import json
+from re import compile as regex
 from time import sleep
 from playwright.sync_api import expect
 
@@ -125,6 +126,14 @@ def test_initial_value(page, form, viewname):
         assert select_element.evaluate('elem => elem.value') == ''
 
 
+# dj_required = 'dj-required'
+# dj_touched = 'dj-touched'
+# dj_untouched = re.compile('dj-untouched')
+# dj_pristine = re.compile('dj-pristine')
+# dj_dirty = 'dj-dirty'
+# ds_unique_identifier = regex(r'ds-[0-9a-z]{9,11}')
+
+
 @pytest.mark.urls(__name__)
 @pytest.mark.parametrize('viewname', ['selectize1'])
 def test_changing_value(page, form, viewname):
@@ -134,7 +143,7 @@ def test_changing_value(page, form, viewname):
     assert input_element.evaluate('elem => elem.value') == ''
     field_group_element = page.locator('django-formset [role="group"]')
     expect(field_group_element).to_have_count(1)
-    expect(field_group_element).to_have_class('dj-required dj-untouched dj-pristine')
+    expect(field_group_element).to_have_class(regex(r'dj-required ds-[0-9a-z]{9,11} dj-untouched dj-pristine'))
     expect(field_group_element).not_to_have_class('dj-dirty')
     dropdown_element = page.locator('django-formset .shadow-wrapper .ts-dropdown.single')
     expect(dropdown_element).to_have_count(1)
@@ -148,7 +157,7 @@ def test_changing_value(page, form, viewname):
     assert pseudo_option.get_attribute('data-value') == str(initial_opinion.id)
     expect(pseudo_option).to_have_text(initial_opinion.label)
     pseudo_option.click()
-    expect(field_group_element).to_have_class('dj-required dj-touched dj-dirty')
+    expect(field_group_element).to_have_class(regex(r'dj-required ds-[0-9a-z]{9,11} dj-touched dj-dirty'))
     expect(dropdown_element).to_be_hidden()
     expect(page.locator('django-formset form:valid')).to_have_count(1)
     selected_item_element = page.locator('django-formset .shadow-wrapper .ts-wrapper .ts-control div.item')
@@ -177,7 +186,7 @@ def test_add_multiple(page, form, viewname):
     assert input_element.evaluate('elem => elem.value') == ''
     field_group_element = page.locator('django-formset [role="group"]')
     expect(field_group_element).to_have_count(1)
-    expect(field_group_element).to_have_class('dj-required dj-untouched dj-pristine')
+    expect(field_group_element).to_have_class(regex(r'dj-required ds-[0-9a-z]{9,11} dj-untouched dj-pristine'))
     expect(field_group_element).not_to_have_class('dj-dirty')
     dropdown_element = page.locator('django-formset .shadow-wrapper .ts-dropdown.multi')
     expect(dropdown_element).to_have_count(1)
@@ -219,13 +228,13 @@ def test_change_multiple(page, form, viewname):
     assert set(values) == set(str(i) for i in get_initial_opinions().values_list('id', flat=True))
     field_group_element = formset_element.locator('[role="group"]')
     expect(field_group_element).to_be_visible()
-    expect(field_group_element).to_have_class('dj-untouched dj-pristine')
+    expect(field_group_element).to_have_class(regex(r'ds-[0-9a-z]{9,11} dj-untouched dj-pristine'))
     remove_selected_item_element = formset_element.locator(f'.shadow-wrapper .ts-wrapper .ts-control div[data-value="{values[1]}"].item .remove')
     expect(remove_selected_item_element).to_be_visible()
     remove_selected_item_element.click()
     item_elements = formset_element.locator(f'.shadow-wrapper .ts-wrapper .ts-control div.item')
     expect(item_elements).to_have_count(3)
-    expect(field_group_element).to_have_class('dj-untouched dj-dirty')
+    expect(field_group_element).to_have_class(regex(r'ds-[0-9a-z]{9,11} dj-untouched dj-dirty'))
 
 
 @pytest.mark.urls(__name__)
@@ -337,12 +346,12 @@ def test_reset_selectize(page, view, form, viewname):
 @pytest.mark.parametrize('viewname', ['selectize0'])
 def test_touch_selectize(page, form, viewname):
     field_group = page.locator('django-formset [role="group"]')
-    expect(field_group).to_have_class('dj-untouched dj-pristine')
+    expect(field_group).to_have_class(regex(r'ds-[0-9a-z]{9,11} dj-untouched dj-pristine'))
     placeholder = page.locator('django-formset ul.dj-errorlist > li.dj-placeholder')
     expect(placeholder).to_have_text('')
     input_element = page.locator('django-formset .shadow-wrapper .ts-wrapper .ts-control input[type="text"]')
     expect(input_element).to_be_visible()
     input_element.focus()
-    expect(field_group).to_have_class('dj-pristine dj-touched')
+    expect(field_group).to_have_class(regex(r'ds-[0-9a-z]{9,11} dj-pristine dj-touched'))
     page.locator('django-formset').evaluate('elem => elem.reset()')
-    expect(field_group).to_have_class('dj-pristine dj-untouched')
+    expect(field_group).to_have_class(regex(r'ds-[0-9a-z]{9,11} dj-pristine dj-untouched'))

@@ -108,40 +108,60 @@ class CustomHyperlinkDialogForm(dialogs.RichtextDialogForm):
     )
 
 
+font_classes = {
+    'open-sans-regular': 'Open Sans',
+    'dancing-script-regular': 'Dancing Script',
+    'lato-regular': 'Lato',
+    'merriweather-regular': 'Merriweather',
+    'montserrat-regular': 'Montserrat',
+    'roboto-regular': 'Roboto',
+    'pacifio-regular': 'Pacifico',
+    'incosolata-regular': 'Incosolata',
+    'playfair-display-regular': 'Playfair Display',
+}
+
+
 class AdvertisementForm(forms.Form):
     ad_text = fields.CharField(
         widget=RichTextarea(control_elements=[
-            controls.Heading([1,2,3]),
-            controls.Bold(),
-            controls.Blockquote(),
-            controls.CodeBlock(),
-            controls.HardBreak(),
-            controls.Italic(),
-            controls.Underline(),
-            #controls.TextColor(['rgb(212, 0, 0)', 'rgb(0, 212, 0)', 'rgb(0, 0, 212)']),
-            controls.TextColor(['text-red', 'text-green', 'text-blue']),
-            controls.TextIndent(),
-            controls.TextIndent('outdent'),
-            controls.TextMargin('increase'),
-            controls.TextMargin('decrease'),
-            controls.TextAlign(['left', 'center', 'right']),
-            controls.HorizontalRule(),
-            controls.Strike(),
-            controls.Subscript(),
-            controls.Superscript(),
-            controls.Separator(),
-            controls.ClearFormat(),
-            controls.Redo(),
-            controls.Undo(),
-            controls.DialogControl(
-                CustomHyperlinkDialogForm(),
-                icon='formset/icons/link.svg',
-            ),
-            controls.DialogControl(dialogs.SimpleImageDialogForm()),
-            controls.DialogControl(dialogs.PlaceholderDialogForm()),
-            controls.DialogControl(dialogs.FootnoteDialogForm()),
+            controls.Group([
+                controls.Heading([1,2,3]),
+                controls.Bold(),
+                controls.Blockquote(),
+                controls.CodeBlock(),
+                controls.HardBreak(),
+                controls.Italic(),
+                controls.Underline(),
+            ]),
+            controls.Group([
+                controls.TextColor(['text-red', 'text-green', 'text-blue']),
+                #controls.TextColor(['rgb(212, 0, 0)', 'rgb(0, 212, 0)', 'rgb(0, 0, 212)']),
+                controls.FontFamily(font_classes),
+                controls.TextIndent(),
+                controls.TextIndent('outdent'),
+                controls.TextMargin('increase'),
+                controls.TextMargin('decrease'),
+                controls.TextAlign(['left', 'center', 'right']),
+            ]),
+            controls.Group([
+                controls.HorizontalRule(),
+                controls.Strike(),
+                controls.Subscript(),
+                controls.Superscript(),
+            ]),
+            controls.Group([
+                controls.ClearFormat(),
+                controls.Redo(),
+                controls.Undo(),
+                controls.DialogControl(
+                    CustomHyperlinkDialogForm(),
+                    icon='formset/icons/link.svg',
+                ),
+                controls.DialogControl(dialogs.SimpleImageDialogForm()),
+                controls.DialogControl(dialogs.PlaceholderDialogForm()),
+                controls.DialogControl(dialogs.FootnoteDialogForm()),
+            ]),
         ],
-        attrs={'placeholder': "Start typing …", 'use_json': True}),
+        attrs={'placeholder': "Start typing …", 'use_json': True, 'maxlength': 2000}),
         initial=initial_json['ad_text'],
-        # initial=initial_html,
     )

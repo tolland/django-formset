@@ -30,6 +30,7 @@ import Underline from '@tiptap/extension-underline';
 import {TextIndent, TextIndentOptions } from '../tiptap-extensions/indent';
 import {TextMargin, TextMarginOptions } from '../tiptap-extensions/margin';
 import {TextColor} from '../tiptap-extensions/color';
+import {FontFamily} from '../tiptap-extensions/font';
 import {StyleHelpers} from './helpers';
 import {FormDialog} from './FormDialog';
 import {parse} from '../build/function-code';
@@ -71,7 +72,7 @@ abstract class Action {
 
 
 abstract class DropdownAction extends Action {
-	protected readonly dropdownMenu: HTMLUListElement | null;
+	protected readonly dropdownMenu: HTMLUListElement|null;
 	protected readonly dropdownItems: NodeListOf<Element>;
 
 	constructor(wrapperElement: HTMLElement, name: string, button: HTMLButtonElement, itemsSelector: string) {
@@ -107,9 +108,11 @@ abstract class DropdownAction extends Action {
 		if (this.dropdownMenu) {
 			const expanded = (force !== false && this.button.ariaExpanded === 'false');
 			this.button.ariaExpanded = expanded ? 'true' : 'false';
-			computePosition(this.button, this.dropdownMenu).then(
-				({x, y}) => Object.assign(this.dropdownMenu!.style, {left: `${x}px`, top: `${y}px`})
-			);
+			if (expanded) {
+				computePosition(this.button, this.dropdownMenu).then(
+					({x, y}) => Object.assign(this.dropdownMenu!.style, {left: `${x}px`, top: `${y}px`})
+				);
+			}
 		}
 	}
 
@@ -220,10 +223,10 @@ namespace controls {
 			super(wrapperElement, name, button, '[richtext-click^="color:"]');
 			if (!(button.nextElementSibling instanceof HTMLUListElement) || button.nextElementSibling.getAttribute('role') !== 'menu')
 				throw new Error('Text color requires a sibling element <ul role="menu">…</ul>');
-			this.collecColors();
+			this.collectColors();
 		}
 
-		private collecColors() {
+		private collectColors() {
 			this.dropdownItems.forEach(element => {
 				const color = this.extractColor(element);
 				if (!color)
@@ -298,12 +301,95 @@ namespace controls {
 		protected toggleItem(event: MouseEvent, editor: Editor) {
 			let element = event.target instanceof Element ? event.target : null;
 			while (element) {
-				if (element instanceof HTMLAnchorElement) {
+				if (element.role === 'menuitem') {
 					const color = this.extractColor(element);
 					if (color) {
 						editor.chain().focus().setColor(color).run();
 					} else {
 						editor.chain().focus().unsetColor().run();
+					}
+					this.activate(editor);
+					this.toggleMenu(editor, false);
+					break;
+				}
+				element = element.parentElement;
+			}
+		}
+	}
+
+	export class FontFamilyAction extends DropdownAction {
+		private allowedClasses: Array<string> = [];
+
+		constructor(wrapperElement: HTMLElement, name: string, button: HTMLButtonElement) {
+			super(wrapperElement, name, button, '[richtext-click^="font:"]');
+			if (!(button.nextElementSibling instanceof HTMLUListElement) || button.nextElementSibling.getAttribute('role') !== 'menu')
+				throw new Error('Font Family requires a sibling element <ul role="menu">…</ul>');
+			this.collectFonts();
+		}
+
+		private collectFonts() {
+			this.dropdownItems.forEach(element => {
+				const cssClass = this.extractFont(element);
+				if (!cssClass)
+					return;
+				if (/^-?[_a-zA-Z]+[_a-zA-Z0-9-]*$/.test(cssClass)) {
+					this.allowedClasses.push(cssClass);
+				} else {
+					throw new Error(`${cssClass} is not a valid CSS class.`);
+				}
+			});
+		}
+
+		private extractFont(element: Element) {
+			const parts = element.getAttribute('richtext-click')?.split(':') ?? [];
+			if (parts.length !== 2)
+				throw new Error(`Element ${element} requires attribute 'richtext-click'.`);
+			if (parts[1] === 'null')
+				return null;
+			return parts[1];
+		}
+
+		clicked() {}
+
+		activate(editor: Editor) {
+			let isActive = false;
+			this.dropdownItems.forEach(element => {
+				const fontFamily = this.extractFont(element);
+				if (fontFamily) {
+					if (editor.isActive({fontFamily})) {
+						isActive = true
+					}
+				}
+			});
+			this.button.classList.toggle('active', isActive);
+		}
+
+		extendExtensions(extensions: Array<Extension|Mark|Node>) {
+			let unmergedOptions = true;
+			extensions.forEach(e => {
+				if (e.name === 'fontFamily')
+					throw new Error("RichtextArea allows only one control element with 'fontFamily'.");
+			});
+			extensions.push(FontFamily.configure({allowedClasses: this.allowedClasses}));
+		}
+
+		protected toggleMenu(editor: Editor, force?: boolean) {
+			super.toggleMenu(editor, force);
+			this.dropdownItems.forEach(element => {
+				const cssClass = this.extractFont(element);
+				element.parentElement?.classList.toggle('active', editor.isActive({fontFamily: cssClass}));
+			});
+		}
+
+		protected toggleItem(event: MouseEvent, editor: Editor) {
+			let element = event.target instanceof Element ? event.target : null;
+			while (element) {
+				if (element.role === 'menuitem') {
+					const cssClass = this.extractFont(element);
+					if (cssClass) {
+						editor.chain().focus().setFont(cssClass).run();
+					} else {
+						editor.chain().focus().unsetFont().run();
 					}
 					this.activate(editor);
 					this.toggleMenu(editor, false);
@@ -492,7 +578,7 @@ namespace controls {
 		protected toggleItem(event: MouseEvent, editor: Editor) {
 			let element = event.target instanceof Element ? event.target : null;
 			while (element) {
-				if (element instanceof HTMLButtonElement || element instanceof HTMLAnchorElement) {
+				if (element.role === 'menuitem') {
 					const level = this.extractLevel(element);
 					editor.chain().focus().setHeading({level: level}).run();
 					this.activate(editor);
@@ -582,7 +668,7 @@ namespace controls {
 		protected toggleItem(event: MouseEvent, editor: Editor) {
 			let element = event.target instanceof Element ? event.target : null;
 			while (element) {
-				if (element instanceof HTMLButtonElement || element instanceof HTMLAnchorElement) {
+				if (element.role === 'menuitem') {
 					const alignment = this.extractAlignment(element);
 					editor.chain().focus().setTextAlign(alignment).run();
 					this.activate(editor);
@@ -639,7 +725,7 @@ class RichtextFormDialog extends FormDialog {
 			if (innerElement instanceof HTMLInputElement && innerElement.hasAttribute('richtext-selection')) {
 				this.textSelectionField = innerElement;
 			} else if (innerElement.hasAttribute('richtext-map-to') || innerElement.hasAttribute('richtext-map-from')) {
-				this.inputElements.push(innerElement as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement);
+				this.inputElements.push(innerElement as HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement);
 			} else if (innerElement instanceof HTMLButtonElement) {
 				const action = innerElement.getAttribute('df-click');
 				if (action?.startsWith('activate')) {
@@ -771,6 +857,7 @@ class RichtextFormDialog extends FormDialog {
 			this.textSelectionField.value = doc.textBetween(selection.from, selection.to, '');
 		}
 		super.openDialog();
+		this.element.style.maxWidth = `${this.richtext.wrapperElement.clientWidth}px`;  // prevent overflow
 		this.richtext.textAreaElement.dispatchEvent(new Event('blur', {bubbles: true}));
 	}
 
@@ -844,16 +931,17 @@ class RichtextFormDialog extends FormDialog {
 
 class RichtextArea {
 	public readonly textAreaElement: HTMLTextAreaElement;
-	private readonly menubarElement: HTMLElement | null;
+	private readonly menubarElement: HTMLElement|null;
 	public readonly wrapperElement: HTMLElement;
 	private readonly registeredActions = new Array<Action>();
 	public readonly formDialogs = new Array<RichtextFormDialog>();
 	private readonly useJson: boolean = false;
-	private readonly observer: MutationObserver;
+	private readonly attributesObserver: MutationObserver;
+	private readonly resizeObserver: ResizeObserver;
 	public editor!: Editor;
-	private initialValue!: JSONContent | string;
+	private initialValue!: JSONContent|string;
 	private characterCountTemplate?: Function;
-	private charaterCountDiv: HTMLElement | null = null;
+	private charaterCountDiv: HTMLElement|null = null;
 	private readonly baseSelector = '.dj-richtext-wrapper';
 	public readonly initializedPromise: Promise<void>;
 	public isInitialized = false;
@@ -866,7 +954,8 @@ class RichtextArea {
 		if (!StyleHelpers.stylesAreInstalled(this.baseSelector)) {
 			this.transferStyles();
 		}
-		this.observer = new MutationObserver(mutationsList => this.attributesChanged(mutationsList));
+		this.attributesObserver = new MutationObserver(mutationsList => this.attributesChanged(mutationsList));
+		this.resizeObserver = new ResizeObserver(() => this.wrapMenubar());
 		this.initializedPromise = this.initialize();
 	}
 
@@ -883,10 +972,23 @@ class RichtextArea {
 				}
 				this.contentUpdate();
 				this.installEventHandlers();
-				this.observer.observe(this.textAreaElement, {attributes: true});
+				this.attributesObserver.observe(this.textAreaElement, {attributes: true});
+				if (this.menubarElement) {
+					this.resizeObserver.observe(this.menubarElement);
+					this.wrapMenubar();
+				}
 				this.isInitialized = true;
 				resolve();
 			});
+		});
+	}
+
+	private wrapMenubar() {
+		this.menubarElement?.querySelectorAll('[role="group"]').forEach(element => {
+			if (!(element instanceof HTMLElement) || !(element.nextElementSibling instanceof HTMLElement))
+				return;
+			const sameRow = element.offsetLeft < element.nextElementSibling.offsetLeft;
+			element.classList.toggle('has-sibling', sameRow);
 		});
 	}
 
@@ -932,11 +1034,11 @@ class RichtextArea {
 
 	private async registerFormDialogs(extensions: Array<Extension|Mark|Node>) {
 		return new Promise<void>(resolve => {
-			const promises = new Array<Promise<Mark | Node>>();
+			const promises = new Array<Promise<Mark|Node>>();
 			this.menubarElement?.querySelectorAll('button[df-click]').forEach(button => {
 				if (!(button instanceof HTMLButtonElement))
 					return;
-				const dialogElement = this.wrapperElement?.querySelector(`dialog[df-induce-open="${button.name}:active"]`);
+				const dialogElement = this.wrapperElement?.querySelector(`:scope > dialog[df-induce-open="${button.name}:active"]`);
 				if (dialogElement instanceof HTMLDialogElement) {
 					const formDialog = new RichtextFormDialog(dialogElement, button, this);
 					if (this.formDialogs.find(dialog => dialog.extension === formDialog.extension))
@@ -1130,7 +1232,7 @@ class RichtextArea {
 		// TODO: remove event handlers
 	}
 
-	public getValue() : JSONContent | string {
+	public getValue() : JSONContent|string {
 		if (this.editor === undefined || this.editor.isEmpty)
 			return '';  // otherwise empty field is not detected by calling function
 		return this.useJson ? this.editor.getJSON() : this.editor.getHTML();

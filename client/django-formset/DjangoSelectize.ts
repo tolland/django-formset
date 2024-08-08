@@ -20,6 +20,7 @@ export class DjangoSelectize extends IncompleteSelect {
 	private readonly observer: MutationObserver;
 	private readonly initialValue: string|string[] = '';
 	private readonly baseSelector = '.ts-wrapper';
+	private readonly uniqueIdentifier: string;
 
 	constructor(tomInput: HTMLSelectElement) {
 		super(tomInput);
@@ -39,8 +40,10 @@ export class DjangoSelectize extends IncompleteSelect {
 		this.observer = new MutationObserver(this.attributesChanged);
 		this.observer.observe(tomInput, {attributes: true});
 		this.initialValue = this.currentValue;
+		this.uniqueIdentifier = `ds-${Math.random().toString(36).substring(2, 15)}`;
 		this.shadowRoot = this.wrapInShadowRoot();
 		DjangoSelectize.styleSheet = DjangoSelectize.styleSheet ?? this.transferStyles(nativeStyles);
+		this.appendIndividualStyleSheet(DjangoSelectize.styleSheet);
 		tomInput.classList.add('dj-concealed');
 		this.validateInput(this.initialValue as string);
 	}
@@ -162,12 +165,16 @@ export class DjangoSelectize extends IncompleteSelect {
 	}
 
 	private wrapInShadowRoot() : ShadowRoot {
+		const group = this.tomSelect.input.parentElement;
+		if (!(group instanceof HTMLElement))
+			throw new Error("Could not find parent element");
+		group.classList.add(this.uniqueIdentifier);  // see appendIndividualStyleSheet() for usage of this CSS class
 		const shadowWrapper = document.createElement('div');
 		shadowWrapper.classList.add('shadow-wrapper');
 		const shadowRoot = shadowWrapper.attachShadow({mode: 'open', delegatesFocus: true});
 		shadowRoot.adoptedStyleSheets = [new CSSStyleSheet()];
 		this.tomSelect.input.insertAdjacentElement('beforebegin', shadowWrapper);
-		const wrapper = (this.tomSelect.input.parentElement as HTMLElement).removeChild(this.tomSelect.wrapper);
+		const wrapper = group.removeChild(this.tomSelect.wrapper);
 		shadowRoot.appendChild(wrapper);
 		return shadowRoot;
 	}
@@ -184,8 +191,9 @@ export class DjangoSelectize extends IncompleteSelect {
 		let loaded = false;
 		for (let index = 0; sheet && index < sheet.cssRules.length; index++) {
 			const cssRule = sheet.cssRules.item(index) as CSSStyleRule;
-			let extraStyles: string | null = null;
-			switch (cssRule.selectorText.trim()) {
+			const selectorText = cssRule.selectorText.trim();
+			let extraStyles: string|null = null;
+			switch (selectorText) {
 				case this.baseSelector:
 					extraStyles = StyleHelpers.extractStyles(tomInput, [
 						'font-family', 'font-size', 'font-stretch', 'font-style', 'font-weight',
@@ -263,6 +271,28 @@ export class DjangoSelectize extends IncompleteSelect {
 		if (!loaded)
 			throw new Error(`Could not load styles for ${this.baseSelector}`);
 		return sheet;
+	}
+
+	private appendIndividualStyleSheet(sheet: CSSStyleSheet) {
+		// `:host-context()` does not work with `:has()` or other complex selectors. Therefore, it is impossible to
+		// use it as a selector for the shadow root of this individual component. To apply styles to this shadow root's
+		// instance, depending on context of the host element, we use a unique CSS class. This class is added during
+		// initialization to the wrapping element of the shadow root, see `wrapInShadowRoot()`.
+		// Here we replace the `:host-context()`-selectors with that individual class.
+		const individualSheet = new CSSStyleSheet();
+		for (let index = 0; sheet && index < sheet.cssRules.length; index++) {
+			const cssRule = sheet.cssRules.item(index) as CSSStyleRule;
+			const selectorText = cssRule.selectorText.trim();
+			switch (selectorText) {
+				case ':host-context([role="group"].dj-touched.ds-unique-identifier) .ts-wrapper.has-items:not(.input-active) .ts-control':
+				case ':host-context([role="group"].dj-touched.ds-unique-identifier) .ts-wrapper.invalid:not(.input-active) .ts-control':
+					individualSheet.insertRule(cssRule.cssText.replace('.ds-unique-identifier', `.${this.uniqueIdentifier}`));
+					break;
+				default:
+					break;
+			}
+		}
+		this.shadowRoot.adoptedStyleSheets.push(individualSheet);
 	}
 
 	public initialize() {

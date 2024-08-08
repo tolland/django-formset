@@ -376,7 +376,7 @@ class FieldGroup {
 		this.element.classList.add('dj-submitted');
 	}
 
-	private showErrorMessage(element: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement) {
+	private showErrorMessage(element: HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement) {
 		const submitted = this.element.classList.contains('dj-submitted');
 		if (!(this.isTouched || submitted) || !this.form.formset.showFeedbackMessages || !this.errorPlaceholder)
 			return;
@@ -1543,16 +1543,16 @@ class DjangoFormCollection {
 		children.forEach(child => child.removeFreshAndEmpty());
 	}
 
-	static getChildCollections(element: Element) : NodeListOf<HTMLElement> | [] {
+	static getChildCollections(element: Element) : NodeListOf<HTMLElement>|[] {
 		// traverse tree to find first occurrence of a <django-form-collection> and if so, return it with its siblings
 		const wrapper = element.querySelector('django-form-collection')?.parentElement;
-		return wrapper ? wrapper.querySelectorAll(':scope > django-form-collection:not([sibling-position])') : [];
+		return wrapper?.querySelectorAll(':scope > django-form-collection:not([sibling-position])') ?? [];
 	}
 
-	static getChildSiblingsCollections(element: Element) : NodeListOf<HTMLElement> | [] {
+	static getChildSiblingsCollections(element: Element) : NodeListOf<HTMLElement>|[] {
 		// traverse tree to find first occurrence of a <django-form-collection> and if so, return it with its siblings
 		const wrapper = element.querySelector('django-form-collection')?.parentElement;
-		return wrapper ? wrapper.querySelectorAll(':scope > django-form-collection[sibling-position]') : [];
+		return wrapper?.querySelectorAll(':scope > django-form-collection[sibling-position]') ?? [];
 	}
 
 	static resetCollectionsToInitial(formCollections: Array<DjangoFormCollection>) {
