@@ -148,7 +148,7 @@
 	}
 }
 
-:host-context([role="group"].dj-touched) .ts-wrapper {
+:host-context([role="group"].dj-touched.ds-unique-identifier) .ts-wrapper {
 	&.has-items:not(.input-active) .ts-control {
 		border-color: var(--django-formset-color-valid);
 	}
