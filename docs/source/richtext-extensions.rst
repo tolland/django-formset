@@ -8,13 +8,31 @@ Richtext Extensions
 
 Having a Richtext editor which can set simple property values such as **bold** or *italic* on
 editable text elements is not a big deal, even the most basic implementation can do that. The
-difficulty arises when you want to set more than one property on a certain element.
+difficulty arises when you want to set more than one property on a certain paragraph or node.
 
 Take for instance the hyperlink, the most basic implementation requires two fields: the URL and the
 text to display. But some implementers might want to set more properties, such as the rel_, the
-target_ attribute or they want to use links to download files or to link onto phone numbers or email
-addresses. If the Richtext editor shall be used in a CMS or an e-commerce site, one might want to
-set a link to an internal CMS page or a product instead of an external URL. This requires a dialog
+target_ attribute or they want to link onto phone numbers, email addresses or to downloadable files.
+Moreover, if the Richtext editor shall be used in a CMS or an e-commerce site, one might want to
+set a link to an internal CMS page or a product, to keep referential integrity which is impossible
+when just using a plain URL.
+
+As another example consider adding an image element to the Richtext editor. A typical off-the-shelf
+implementation would offer a file upload area and a few additional fields to set the image's width,
+height and alt tags. The image's payload then is stored as a base64 encoded string in the editor's
+document state, which should be considered as anti-pattern. So what if instead the implementer wants
+to store the image as a file and the meta-data in a separate database table? Here is where
+**django-formset** offers a flexible way to create your own custom dialog forms to extend the
+Richtext editor with your own needs.
+
+So the basic idea is to allow the implementer to extend the Richtext editor with custom dialog forms
+based on the same principles as the built-in :ref:`dialog-forms`. This way the implementer can
+combine any fields and widgets to create a dialog form which fits his exact needs. This dialog form
+then can be attached to the Richtext editor as a control element, which can be used to set the
+properties of a certain node or mark element.
+
+
+This requires a dialog
 form to be shown, where the user can select a page or product and select this out of a list of
 available options.
 
@@ -22,9 +40,10 @@ available options.
 .. _target: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#target
 
 As we can see, there are many use cases where the implementer might want to extend the Richtext
-editor with a custom dialog form adopted to his exact needs. Since **django-formset** provides a way
-to declare :ref:`dialog-forms`, we can use this to adopt our hyperlink editor to accept any
-arbitrary attribute value.
+editor with a custom dialog form adopted to his exact needs. In this example we show how to create a
+custom hyperlink editor where a user can either select an external URL or an internal page for a
+book from a library. The internal page is a model object of type ``PageModel`` and can be selected
+using the :ref:`selectize`.
 
 .. django-view:: pages_dialog
 
@@ -85,6 +104,7 @@ Here we define a custom dialog form for the hyperlink editor. This dialog form h
 of which ``url`` and ``page`` are mapped as parameters to the anchor element in HTML. The other two
 fields are used to set the text of the link and to toggle between an internal and an external link.
 
+Let's go through the fields one by one:
 
 .. rubric:: The ``text`` field
 
@@ -214,6 +234,7 @@ documentation on extensions`_.
 For our custom hyperlink extension, this short JavaScript file will do the job:
 
 .. code-block:: javascript
+	:caption: myapp/tiptap-extensions/custom_hyperlink.js
 
 	{
 	    name: 'custom_hyperlink',

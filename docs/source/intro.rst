@@ -54,18 +54,19 @@ What does that mean? In Django we can define a form as a group of fields with ce
 Often these forms are derived from a Django model. On the client, this form then is rendered, can
 be filled with data and submitted back to the server.
 
-Typically there is one form per page, because the HTML standard does not allow you to submit more
-than one form in one submission. With the introduction of FormSets_, Django provides a workaround
-for this use-case. It however relies on prefixing each field from the forms making up a "FormSet"
-with a unique identifier, so that those Django forms can be wrapped into one HTML
-``<form>``-element. This makes the handling of multiple forms per page cumbersome and difficult to
-understand.
+Typically there is one form per page, because the HTML standard does not allow to submit more than
+one form per submission. With the introduction of FormSets_, Django provides a workaround for this
+use-case. It however relies on prefixing each field from the forms making up a "FormSet" with a
+unique identifier, so that those Django forms can be wrapped into one HTML ``<form>``-element. This
+makes the handling of multiple forms per page cumbersome and difficult to understand.
 
 By using **django-formset** on the other hand, each Django form corresponds to its own
 self-contained ``<form>``-element. Inside each of these forms, all field names remain unmodified
 and on submission, each form introduces its own namespace, so that the form data is submitted as a
-dictionary of field-value-pairs, where each value can be a subdictionary or array. By doing so, we
-can nest forms deeply, something currently not possible with Django FormSets_.
+dictionary of field-value-pairs, where each value can be a sub-dictionary or array (JSON). By doing
+so, we can nest forms deeply, something currently not possible with Django FormSets_. The
+furthermore allows to validate each form individually, using the validation functions built into the
+browser. 
 
 .. _Form: https://docs.djangoproject.com/en/stable/topics/forms/
 .. _FormSets: https://docs.djangoproject.com/en/stable/topics/forms/formsets/

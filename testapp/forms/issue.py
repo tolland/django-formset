@@ -75,7 +75,7 @@ class IssueForm(ModelForm):
         widget=Selectize(
             search_lookup='full_name__icontains',
         ),
-        required=False,
+        required=True,
     )
     edit_reporter = Activator(
         label="Edit Reporter",
