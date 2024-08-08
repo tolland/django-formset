@@ -1,7 +1,5 @@
 import isString from 'lodash.isstring';
-import {StyleHelpers} from './helpers';
 import {parse} from '../build/tag-attributes';
-import styles from './DjangoFormset.scss';
 
 
 export abstract class FormDialog {
@@ -11,7 +9,6 @@ export abstract class FormDialog {
 	protected readonly isModal: boolean;
 	protected readonly induceOpen: Function;
 	protected readonly induceClose: Function;
-	private readonly baseSelector = 'dialog[is="django-dialog-form"]';
 	private dialogRect: DOMRect|null = null;
 	private dialogOffsetX: number = 0;
 	private dialogOffsetY: number = 0;
@@ -22,9 +19,6 @@ export abstract class FormDialog {
 		if (!this.formElement)
 			throw new Error(`${this} requires child <form method="dialog">`);
 		this.dialogHeaderElement = this.element.querySelector('.dialog-header');
-		if (!StyleHelpers.stylesAreInstalled(this.baseSelector)) {
-			this.transferStyles();
-		}
 		this.isModal = this.element.hasAttribute('df-modal');
 		this.induceOpen = this.evalInducer('df-induce-open', (...args: any[]) => this.openDialog(...args));
 		this.induceClose = this.evalInducer('df-induce-close', (...args: any[]) => this.closeDialog(...args));
@@ -111,14 +105,6 @@ export abstract class FormDialog {
 			dialogHeaderElement.addEventListener('touchend', handleTouchEnd, {once: true});
 		}
 	};
-
-	private transferStyles() {
-		const declaredStyles = document.createElement('style');
-		declaredStyles.innerText = styles;
-		document.head.appendChild(declaredStyles);
-		if (!declaredStyles.sheet)
-			throw new Error("Could not create <style> element");
-	}
 
 	// Hook to be overridden by subclasses.
 	// It shall return the aggregated data of the form dialog.
