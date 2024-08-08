@@ -108,9 +108,11 @@ abstract class DropdownAction extends Action {
 		if (this.dropdownMenu) {
 			const expanded = (force !== false && this.button.ariaExpanded === 'false');
 			this.button.ariaExpanded = expanded ? 'true' : 'false';
-			computePosition(this.button, this.dropdownMenu).then(
-				({x, y}) => Object.assign(this.dropdownMenu!.style, {left: `${x}px`, top: `${y}px`})
-			);
+			if (expanded) {
+				computePosition(this.button, this.dropdownMenu).then(
+					({x, y}) => Object.assign(this.dropdownMenu!.style, {left: `${x}px`, top: `${y}px`})
+				);
+			}
 		}
 	}
 
@@ -855,6 +857,7 @@ class RichtextFormDialog extends FormDialog {
 			this.textSelectionField.value = doc.textBetween(selection.from, selection.to, '');
 		}
 		super.openDialog();
+		this.element.style.maxWidth = `${this.richtext.wrapperElement.clientWidth}px`;  // prevent overflow
 		this.richtext.textAreaElement.dispatchEvent(new Event('blur', {bubbles: true}));
 	}
 
