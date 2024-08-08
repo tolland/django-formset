@@ -109,5 +109,11 @@
     "typescript": "^4.9.5",
     "uikit": "^3.16.19",
     "yargs-parser": "^21.1.1"
+  },
+  "jshintConfig": {
+    "node": false,
+    "esversion": 8,
+    "undef": true,
+    "unused": true
   }
 }
