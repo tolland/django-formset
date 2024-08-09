@@ -109,8 +109,10 @@ abstract class DropdownAction extends Action {
 			const expanded = (force !== false && this.button.ariaExpanded === 'false');
 			this.button.ariaExpanded = expanded ? 'true' : 'false';
 			if (expanded) {
-				computePosition(this.button, this.dropdownMenu).then(
-					({x, y}) => Object.assign(this.dropdownMenu!.style, {left: `${x}px`, top: `${y}px`})
+				computePosition(this.button, this.dropdownMenu, {strategy: 'fixed'}).then(
+					({x, y}) => Object.assign(
+						this.dropdownMenu!.style, {left: `${x}px`, top: `${y}px`}
+					)
 				);
 			}
 		}

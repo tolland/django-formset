@@ -19,11 +19,10 @@ when just using a plain URL.
 
 As another example consider adding an image element to the Richtext editor. A typical off-the-shelf
 implementation would offer a file upload area and a few additional fields to set the image's width,
-height and alt tags. The image's payload then is stored as a base64 encoded string in the editor's
-document state, which should be considered as anti-pattern. So what if instead the implementer wants
-to store the image as a file and the meta-data in a separate database table? Here is where
-**django-formset** offers a flexible way to create your own custom dialog forms to extend the
-Richtext editor with your own needs.
+height and alt tags. The image's payload then often is encoded as a base64 string in the editor's
+document state. So what if instead the implementer wants to store the image as a file and the
+meta-data in a separate database table? Here is where **django-formset** offers a flexible way to
+create custom dialog forms and to extend the Richtext editor with your own needs.
 
 So the basic idea is to allow the implementer to extend the Richtext editor with custom dialog forms
 based on the same principles as the built-in :ref:`dialog-forms`. This way the implementer can
