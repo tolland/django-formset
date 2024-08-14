@@ -109,7 +109,7 @@ syntactic sugar for:
 
 	ApplyButton = Button(action='activate("apply")', button_variant=ButtonVariant.PRIMARY)
 
-	CancelButton = Button(action='activate("cancel")', button_variant=ButtonVariant.SECONDARY)
+	CancelButton = Button(action='activate("close")', button_variant=ButtonVariant.SECONDARY)
 
 The ``CoffeeOrderCollection`` then puts everything together and is rendered by a Django view:
 
@@ -129,7 +129,7 @@ The dialog form is rendered as a ``<dialog>`` element, which recently has been a
 standard. Its main child element is a ``<form method="dialog">`` which is submitted via the dialog
 method. The states of the form controls are saved but not submitted, and the ``returnValue``
 property gets set to the value of the button that was activated. This is why we have to pass
-different arguments ("apply", "cancel")  to the closing buttons.
+different arguments ("apply", "close") to those buttons.
 
 If a collection implements more than one Dialog Form, some or all of them can be opened
 simultaneously. To prevent them from overlapping, these dialogs can be dragged to any position on
@@ -178,14 +178,14 @@ Here is an example of a modal dialog form:
 	    accept = Activator(
 	        label="Accept",
 	        widget=Button(
-	            action='setFieldValue(user.accept_terms, "on") -> activate("cancel")',
+	            action='setFieldValue(user.accept_terms, "on") -> activate("close")',
 	            button_variant=ButtonVariant.PRIMARY,
 	        ),
 	    )
 	    reject = Activator(
 	        label="Reject",
 	        widget=Button(
-	            action='activate("cancel")',
+	            action='activate("close")',
 	            button_variant=ButtonVariant.SECONDARY,
 	        ),
 	    )
@@ -215,9 +215,9 @@ Here is an example of a modal dialog form:
 
 Again, we have a collection named ``AcceptTermsCollection`` with two forms ``UserNameForm`` and
 ``AcceptDialogForm``, where the latter is a modal dialog. The idea is to show the dialog form when
-the user clicks on the "Submit" button, but has not checked the checkbox labeled "Accept terms of
-use". The dialog form contains some informative text about the terms of use, and a button to close
-the dialog.
+the user clicks on the "Submit" button, but has not checked the checkbox input field labeled
+"Accept terms of use". The dialog form contains some informative text about the terms of use, and a
+button to close the dialog.
 
 Here the ``AcceptDialogForm`` actually does not contain any form fields. This dialog opens when the
 user clicks the "Submit" button and the checkbox labled "Accept terms of use" is not checked.
@@ -248,13 +248,13 @@ dialog form's attribute ``induce_open = 'submit:active'``.
 If the modal dialog opens, the user has to either accept or reject the terms of use. If the user
 clicks on the "Accept" button, the first action of our action queue is to set the value of the
 field ``accept_terms`` in form named ``user`` to ``on``. The second action of that queue is
-``activate("cancel")`` which just closes the dialog without side effects. This way the checkbox
-is checked by clicking a button in another form.
+``activate("close")`` which just closes the dialog without side effects. This way the checkbox
+input field is checked by clicking a button in another form.
 
 If the user clicks on the "Reject" button, the dialog is closed without setting the value of the
 checkbox.
 
 .. hint:: Instead of using a checkbox widget for the field ``accept_terms``, it also is possible to
-	use a widget of type ``HiddenInput``. This way the user does not see any checkbox, and so we can
-	assure that the user must open the dialog for reading the terms of use before submitting the
-	form.
+	use a widget of type ``HiddenInput``. This way the user does not even see any checkbox, and so
+	we can assure that the user must open the dialog for reading the terms of use before submitting
+	the form.
