@@ -1,6 +1,10 @@
 ## Changes
 
-1.5.1
+1.5.2
+  * Fix naming issue in interactive docs, preventing the dialog not to close.
+  * Fix in RichtextArea: Dropdown menu did not show up at the right position.
+
+- 1.5.1
   * The published version of **django-formset** now also includes the monolithic build of all
     JavaScript files.
   * In RichtextArea: Add control element to select font family.
@@ -11,7 +15,7 @@
     the widget in a RichtextArea's dialog.
   * Fixed: Main stylesheet sometimes was loaded more than once.
 
-1.5
+- 1.5
   * **Breaking Change:** Always include `<script src="{% url 'javascript-catalog' %}"></script>` to
     the `<head>`-section of an HTML template. This is because `gettext` is used inside many
     JavaScript files. 
@@ -28,7 +32,7 @@
   * Perform all E2E tests by also using the monolithic build. 
   * Add `jest` to explicitly test the parser generator.
 
-1.4.5
+- 1.4.5
   * Fix: When submitting a form with a `FileField`, the `UploadedFileInput` widget returns ``None``
     to signalize that nothing changed. Then however, the `clean()`-method did not access the initial
     value of the field. This is fixed now.
@@ -36,30 +40,30 @@
     returned values. Now, one must explicitly call `is_valid()`, otherwise an `AttributeError` is
     raised. 
 
-1.4.4
+- 1.4.4
   * Fix: In widget `PhoneNumberInput`, the country lookup field did not behave es expected when
     using the up- or down-arrow keys to navigate through the list of countries.
   * In widget `PhoneNumberInput`, entering "0" into the search field now does not filter the list
     of countries anymore. This is because country codes starting with "00" is not a valid E.164
     format.
 
-1.4.3
+- 1.4.3
   * Fix regression in widget `UploadedFileInput` introduced in 1.4: The Delete button did not work
     for files added through the `initial` parameter.
   * Prevent uploading files with an unmatching accept attribute.
   * In widget `PhoneNumberInput`, set focus on country lookup field after opening dropdown box with
     international prefixes.
 
-1.4.2
+- 1.4.2
   * Fix: `SlugInput` widget used an invalid `pattern` attribute in its input field.
   * Removed `^…` and `…$` from all `pattern` attributes in all fields using regular expressions.
   * Add delay on `reload()` handler to prevent early firing of restore.
 
-1.4.1
+- 1.4.1
   * Fix #136: Submit button shows bummer symbol after okay symbol.
   * Fix #132: The size of the input window does not change as the window size changes.
 
-1.4
+- 1.4
   * Add support for form dialogs. They can be used standalone or to add complex extensions to the
     Richtext editor.
   * **Breaking change:** `controls.Link()` must be replaced by
@@ -72,7 +76,7 @@
     buttons as first class input fields.
   * Add support for Django-5.0.
 
-1.3.10
+- 1.3.10
   * Fix #125: IncompleteSelect can't handle collections with siblings.
   * Fix #128: Boolean field shows label twice.
   * In webcomponents, separate constructor from connectedCallback.
@@ -80,53 +84,53 @@
   * postcss-nested-include@1.3 requires relative paths.
   * Upgrade to `flyctl` version 0.2.28.
 
-1.3.9
+- 1.3.9
   * Fix widget `Selectize` losing borders when used in a collection with siblings after a form
     reset.
   * Add support for UTF-8 characters when using the `Selectize` widget with lazy loading.
   * On reset, the number of siblings is set to the initial value.
 
-1.3.8
+- 1.3.8
   * Fail silently if package 'phonenumbers' is not installed.
   * Adopt to Django-5.0
   * In RichtextArea, add padding to placeholder field.
   * In DjangoSelectize make background color almost white.
 
-1.3.7
+- 1.3.7
   * Disable unique checks for Django<4.0, because they are not compatible.
 
-1.3.6
+- 1.3.6
   * Backport to Django-4.0.
 
-1.3.5
+- 1.3.5
   * Fix #99: File upload is not compatible with generic Django storage class.
 
-1.3.4
+- 1.3.4
   * Fix #97: Forms and FormCollections with disabled fields and initial data, now are validated
     using that initial data.
   * The filter in the widget for the `PhoneNumberField` now is cleared after reopening the selector.
 
-1.3.3
+- 1.3.3
   * Fix #96: In `FormCollection` with siblings, the `<form>`'s ID sometimes was not unique.
   * The selector for international prefixes of the `PhoneNumberField`, now offers a search box.
   * Prevent loading styles for `PhoneNumberField` more than once.
 
-1.3.2
+- 1.3.2
   * Handle form reset for `PhoneNumberField` properly.
   * Fix: Monolithic build did not include `PhoneNumberField`.
   * Use cached translation in demo project.
 
-1.3.1
+- 1.3.1
   * Improved the usability of the `PhoneNumberField`. The user is now forced to select the country
     code from a dropdown list, whenever the phone number does not start with `+`.
   * The dropdown list of the `PhoneNumberField` now shows the countries name in the current
     language.
   
-1.3
+- 1.3
   * New widget: `PhoneNumberField` which can be used to improve the user experience when entering 
     phone numbers.
 
-1.2.2
+- 1.2.2
   * Nicer outline and box-shadow, whenever a `DualSelector` element receives input focus. It now
     surrounds the complete field.
   * In the Calendar and DateRange pickers, the cursor changes to a symbol signalizing into which
@@ -134,12 +138,12 @@
   * New widgets: `CountrySelectize` and `CountrySelectizeMultiple` which prefix the country name
     with the corresponding flag.
 
-1.2.1
+- 1.2.1
   * Fix: Ignore key press events for pure calendar widgets. Since a pure calendar widget can not be
     focused, handling key press events does not make sense.
   * Fix: Calendar cells with attribute `disabled` are not selectable anymore.
 
-1.2
+- 1.2
   * Add widgets `DatePicker`, `DateTextbox`, `DateCalendar`, `DateTimePicker`, `DateTimeTextbox`
     and `DateTimeCalendar`. They can be used as alternative widgets to Django's `DateInput` and
     `DateTimeInput` widgets.
