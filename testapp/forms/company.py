@@ -44,11 +44,14 @@ class DepartmentForm(ModelForm):
         fields = ['id', 'name', 'sales_team']
 
     def __init__(self, *args, **kwargs):
-        print(f"DepartmentForm : __init__ : {kwargs=}")
-        department_pk = kwargs.pop("department_pk", None)
         super().__init__(*args, **kwargs)
-
-        self.fields["sales_team"].queryset = Team.objects.filter(department_id=department_pk)
+        # we have current object so get any teams that are related to this department
+        if "instance" in kwargs and kwargs["instance"]:
+            self.fields["sales_team"].queryset = Team.objects.filter(department_id=kwargs["instance"].id)
+        # we don't have an instance so we are creating a new department
+        # so no teams to show
+        else:
+            self.fields["sales_team"].queryset = Team.objects.none()
 
 
 class DepartmentCollection(FormCollection):

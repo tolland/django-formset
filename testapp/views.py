@@ -221,11 +221,9 @@ class DepartmentModelFormView(DemoModelFormView):
             queryset = self.get_queryset()
         return queryset.get(id=self.kwargs['pk'])
 
+    # pass additional kwargs to the form
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs["department_pk"] = self.kwargs["pk"]
-        print(f"DepartmentModelFormView get_form_kwargs kwargs: {kwargs}")
-        print(f"DepartmentModelFormView self.kwwargs kwargs: {self.kwargs}")
         return kwargs
 
 class DemoFormCollectionViewMixin(DemoViewMixin):
