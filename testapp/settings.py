@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.staticfiles',
     'django.contrib.messages',
+    "django_extensions",
     'formset',
     'testapp',
     'django_countries',

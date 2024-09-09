@@ -36,6 +36,13 @@ class Department(models.Model):
         related_name='departments',
     )
 
+    sales_team = models.ForeignKey(
+        "Team",
+        on_delete=models.CASCADE,
+        related_name='sales_team',
+        null=True,
+    )
+
     class Meta:
         verbose_name = "Department"
         verbose_name_plural = "Departments"

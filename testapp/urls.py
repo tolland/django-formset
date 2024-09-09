@@ -27,7 +27,7 @@ def render_landing(request):
 
 
 urlpatterns = [
-    # path('', render_landing),
+    path('', render_landing),
     path('success', lambda request: HttpResponse('<h1>Form data succesfully submitted</h1>'), name='form_data_valid'),
     path('default/', include(('testapp.views', 'default'))),
     path('bootstrap/', include(('testapp.views', 'bootstrap'))),

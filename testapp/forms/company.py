@@ -41,7 +41,14 @@ class DepartmentForm(ModelForm):
 
     class Meta:
         model = Department
-        fields = ['id', 'name']
+        fields = ['id', 'name', 'sales_team']
+
+    def __init__(self, *args, **kwargs):
+        print(f"DepartmentForm : __init__ : {kwargs=}")
+        department_pk = kwargs.pop("department_pk", None)
+        super().__init__(*args, **kwargs)
+
+        self.fields["sales_team"].queryset = Team.objects.filter(department_id=department_pk)
 
 
 class DepartmentCollection(FormCollection):
@@ -54,11 +61,18 @@ class DepartmentCollection(FormCollection):
     related_field = 'company'
 
     def retrieve_instance(self, data):
+        print(f"DepartmentCollection : retrieve_instance {data=}")
         if data := data.get('department'):
             try:
                 return self.instance.departments.get(id=data.get('id') or 0)
             except (AttributeError, Department.DoesNotExist, ValueError):
                 return Department(name=data.get('name'), company=self.instance)
+
+class Department2Collection(DepartmentCollection):
+    extra_siblings = None
+    min_siblings = None
+    max_siblings = None
+
 
 
 class CompanyForm(ModelForm):

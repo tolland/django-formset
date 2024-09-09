@@ -33,7 +33,8 @@ from testapp.forms.address import AddressForm
 from testapp.forms.advertisement import AdvertisementForm
 from testapp.forms.article import ArticleForm
 from testapp.forms.blog import BlogModelForm
-from testapp.forms.company import CompanyCollection, CompaniesCollection
+from testapp.forms.company import CompanyCollection, CompaniesCollection, DepartmentForm, DepartmentCollection, \
+    Department2Collection
 from testapp.forms.complete import CompleteForm
 from testapp.forms.contact import (
     SimpleContactCollection, ContactCollection, ContactCollectionList, IntermediateContactCollectionList,
@@ -61,7 +62,7 @@ from testapp.forms.state import StateForm, StatesForm
 from testapp.forms.terms_of_use import AcceptTermsCollection
 from testapp.forms.user import UserCollection
 from testapp.forms.upload import UploadForm
-from testapp.models import BlogModel, Company, IssueModel, PersonModel, PollModel, Reporter, User
+from testapp.models import BlogModel, Company, IssueModel, PersonModel, PollModel, Reporter, User, Department
 from testapp.models.gallery import Gallery
 
 
@@ -209,6 +210,23 @@ class DemoModelFormView(DemoFormViewMixin, UpdateView):
             form.instance.save(update_fields=['created_by'])
         return response
 
+class DepartmentModelFormView(DemoModelFormView):
+    def get_queryset(self):
+        queryset = self.model.objects.all()
+        return queryset
+
+    def get_object(self, queryset=None):
+        print(f"DepartmentModelForm.get_object: {self.kwargs=}")
+        if queryset is None:
+            queryset = self.get_queryset()
+        return queryset.get(id=self.kwargs['pk'])
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["department_pk"] = self.kwargs["pk"]
+        print(f"DepartmentModelFormView get_form_kwargs kwargs: {kwargs}")
+        print(f"DepartmentModelFormView self.kwwargs kwargs: {self.kwargs}")
+        return kwargs
 
 class DemoFormCollectionViewMixin(DemoViewMixin):
     template_name = 'testapp/form-collection.html'
@@ -307,6 +325,39 @@ class CompaniesCollectionView(DemoFormCollectionViewMixin, BulkEditCollectionVie
             holder['company'].instance.created_by = self.request.session.session_key
         return super().form_collection_valid(form_collection)
 
+
+class DepartmentCollectionView(DemoFormCollectionViewMixin, SessionFormCollectionViewMixin, EditCollectionView):
+    model = Department
+    collection_class = Department2Collection
+    template_name = 'testapp/form-collection.html'
+    extra_context = {
+        'click_actions': 'disable -> submit -> reload !~ scrollToError',
+        'force_submission': False,
+    }
+
+    def get_form_collection(self):
+        res = super().get_form_collection()
+        print(f"DepartmentCollectionView.get_form_collection: {res=}")
+        return res
+
+    def get_collection_kwargs(self):
+        kwargs = super().get_collection_kwargs()
+        print(f"DepartmentCollectionView.get_collection_kwargs: {self.kwargs=}")
+        return kwargs
+
+    def get_queryset(self):
+        print(f"DepartmentCollectionView.get_queryset: {self.kwargs=}")
+        queryset = self.model.objects.filter(company_id=self.kwargs['company_id'])
+        print(f"DepartmentCollectionView.get_queryset: {queryset=}")
+        return queryset
+
+    def get_object(self, queryset=None):
+        print(f"DepartmentCollectionView.get_object: {self.kwargs=}")
+        if queryset is None:
+            queryset = self.get_queryset()
+        object = queryset.get(id=self.kwargs['pk'])
+        print(f"DepartmentCollectionView.get_object: {object=}")
+        return object
 
 class GalleryCollectionView(DemoFormCollectionViewMixin, SessionFormCollectionViewMixin, EditCollectionView):
     model = Gallery
@@ -632,6 +683,12 @@ urlpatterns = [
     ), name='poll'),
     path('company', CompanyCollectionView.as_view(), name='company'),
     path('companies', CompaniesCollectionView.as_view(), name='company'),
+    path('company/<int:company_id>/department/<int:pk>', DepartmentModelFormView.as_view(
+        form_class=DepartmentForm,
+        model=Department,
+    )),
+    path('company/<int:company_id>/department_collection/<int:pk>', DepartmentCollectionView.as_view(
+    )),
     path('user', UserCollectionView.as_view(
         collection_class=UserCollection
     ), name='user'),
