@@ -215,13 +215,19 @@ class DepartmentModelFormView(DemoModelFormView):
         queryset = self.model.objects.all()
         return queryset
 
+    def get_initial(self):
+        initial = super().get_initial()
+        print(f"get_initial {initial=}")
+        initial["department"]["department_id"] = self.kwargs['pk']
+        print(f"get_initial {initial=}")
+        return initial
+
     def get_object(self, queryset=None):
-        print(f"DepartmentModelForm.get_object: {self.kwargs=}")
+        print(f"DepartmentModelFormView.get_object: {self.kwargs=}")
         if queryset is None:
             queryset = self.get_queryset()
         return queryset.get(id=self.kwargs['pk'])
 
-    # pass additional kwargs to the form
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         return kwargs
@@ -333,15 +339,11 @@ class DepartmentCollectionView(DemoFormCollectionViewMixin, SessionFormCollectio
         'force_submission': False,
     }
 
-    def get_form_collection(self):
-        res = super().get_form_collection()
-        print(f"DepartmentCollectionView.get_form_collection: {res=}")
-        return res
-
-    def get_collection_kwargs(self):
-        kwargs = super().get_collection_kwargs()
-        print(f"DepartmentCollectionView.get_collection_kwargs: {self.kwargs=}")
-        return kwargs
+    def get_initial(self):
+        initial = super().get_initial()
+        initial["department"]["department_id"] = self.kwargs['pk']
+        print(f"get_initial {initial=}")
+        return initial
 
     def get_queryset(self):
         print(f"DepartmentCollectionView.get_queryset: {self.kwargs=}")

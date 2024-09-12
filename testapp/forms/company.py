@@ -2,6 +2,7 @@ from django.forms import fields, widgets
 from django.forms.models import ModelForm
 
 from formset.collection import FormCollection
+from formset.utils import FormMixin
 
 from testapp.models.company import Company, Department, Team
 
@@ -33,7 +34,7 @@ class TeamCollection(FormCollection):
                 return Team(name=data.get('name'), department=self.instance)
 
 
-class DepartmentForm(ModelForm):
+class DepartmentForm(FormMixin,ModelForm,):
     id = fields.IntegerField(
         required=False,
         widget=widgets.HiddenInput,
@@ -52,6 +53,14 @@ class DepartmentForm(ModelForm):
         # so no teams to show
         else:
             self.fields["sales_team"].queryset = Team.objects.none()
+
+    def get_context(self):
+        print(f"DepartmentForm : get_context {self.initial=}")
+        self.fields["sales_team"].queryset = Team.objects.filter(
+            department_id=self.initial["department_id"]
+        )
+        context = super().get_context()
+        return context
 
 
 class DepartmentCollection(FormCollection):
